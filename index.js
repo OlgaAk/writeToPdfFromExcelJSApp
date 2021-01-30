@@ -1,6 +1,5 @@
 const { PDFDocument, StandardFonts, rgb } = require("pdf-lib");
 const fs = require("fs");
-
 const ExcelJS = require("exceljs");
 
 const SOURCE_PDF_PATH = "./1.pdf"; //get path from user
@@ -13,37 +12,6 @@ const START_ROW = 10; //make user define
 
 addExcelDataToPdf().catch((err) => console.log(err));
 
-async function writeToPdf(data) {
-  // Create a new document and add a new page
-
-  const doc = await PDFDocument.load(fs.readFileSync(SOURCE_PDF_PATH));
-  const font = await doc.embedFont(StandardFonts.CourierOblique);
-  const pages = await doc.getPages();
-
-  pages.forEach((page, index) => {
-    if (data.length > index) drawTextOnPdf(page, index, data, font);
-  });
-
-  // Write the PDF to a file
-  fs.writeFileSync(OUTPUT_PDF_PATH, await doc.save());
-}
-
-async function readExcel() {
-  let excelValues = [];
-  const workbook = new ExcelJS.Workbook();
-  await workbook.xlsx.readFile(SOURCE_EXCEL_PATH);
-  const sheet = workbook.worksheets[0]; // make user define
-  let start_row = START_ROW;
-  while (true) {
-    let cell = sheet.getCell(`${COLUMN}${start_row}`);
-    console.log(cell.value);
-    if (cell.value == "" || cell.value == "Total:") break; // make user define
-    excelValues.push(cell.value);
-    start_row++;
-  }
-  return excelValues;
-}
-
 async function addExcelDataToPdf() {
   readExcel()
     .then((data) => {
@@ -52,12 +20,71 @@ async function addExcelDataToPdf() {
     .catch((err) => console.log(err));
 }
 
-function drawTextOnPdf(page, index, data, font) {
+async function writeToPdf(excelData) {
+  // Create a new document and add a new page
+  try {
+    const [doc, font, pages] = await setUpPDF();
+    checkInputData(excelData, pages);
+    pages.forEach((page, index) => {
+      // checking to avoid out of index exception
+      if (excelData.length > index) {
+        drawTextOnPdf(page, index, excelData, font, TEXT_SIZE, TEXT_COLOR);
+      }
+    });
+    fs.writeFileSync(OUTPUT_PDF_PATH, await doc.save());
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+async function readExcel() {
+  const sheet = await loadExcelSheet();
+  return getCellValues(sheet, START_ROW, COLUMN);
+}
+
+function drawTextOnPdf(page, index, data, font, size, color) {
   page.drawText(`B#${index + 1} ${data[index]}`, {
     x: 15,
     y: page.getHeight() - 25,
-    size: TEXT_SIZE,
+    size: size,
     font: font,
-    color: TEXT_COLOR,
+    color: color,
   });
+}
+
+function checkInputData(excelData, pages) {
+  if (excelData.length > pages.length) {
+    console.log(
+      `You have more data in excel than pdf pages (${
+        excelData.length - pages.length
+      } cell(s)). This information will be missing.`
+    );
+  } else if (excelData.length < pages.length) {
+    console.log(`Excell data provided is not sufficient for all PDF pages. 
+  ${pages.length - excelData.length} page(s) remaind untouched.`);
+  }
+}
+
+async function loadExcelSheet() {
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.readFile(SOURCE_EXCEL_PATH);
+  return (sheet = workbook.worksheets[0]); // make user define
+}
+
+function getCellValues(sheet, startRow, column) {
+  let excelValues = [];
+  while (true) {
+    let cell = sheet.getCell(`${column}${startRow}`);
+    if (cell.value == "" || cell.value == "Total:") break; // make user define
+    excelValues.push(cell.value);
+    startRow++;
+  }
+  return excelValues;
+}
+
+async function setUpPDF() {
+  const doc = await PDFDocument.load(fs.readFileSync(SOURCE_PDF_PATH));
+  const font = await doc.embedFont(StandardFonts.CourierOblique);
+  const pages = await doc.getPages();
+  return [doc, font, pages];
 }
