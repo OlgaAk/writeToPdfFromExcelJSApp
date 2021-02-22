@@ -1,4 +1,6 @@
 test.pdf
+report.pdf
+report1.pdf
 1.pdf
 2.xlsx
 node_modules
@@ -9,3 +11,8 @@ node_modules
 111.xlsx
 Belege_Januar_2021.pdf
 Belege_Kreditkarte_Januar_2021.pdf
+invoce_data.json
+out.jpg
+ru.traineddata
+rus.traineddata
+eng.traineddata
