@@ -1,5 +1,20 @@
 const fs = require("fs");
 const tesseract = require("tesseract.js"); // OCR package
+const spawn = require("child_process").spawn; // run python script from node (pdf to image) for better quality
+
+convertPdfToImage();
+
+function convertPdfToImage() {
+  const pythonProcess = spawn("python3", ["parse.py", "report1.pdf"]); // takes pdf path as argument
+
+  pythonProcess.stdout.on("data", function (data) {
+    console.log(String.fromCharCode.apply(null, data));
+    if (data === "success") return true;
+  });
+  pythonProcess.stderr.on("data", (data) => {
+    console.log(String.fromCharCode.apply(null, data));
+  });
+}
 
 // stores parsed data before writing to json file
 let jsonData = {
@@ -16,18 +31,18 @@ const testText =
 /// END Globals
 
 //runs code
-extractTextFromImage2Json();
+extractTextFromAllImages();
 
 // Gets text data from each Pdf page, stores it in the global variable and finally writes it to a json file
 async function extractTextFromImage2Json() {
   await extractTextFromAllImages();
-  writeDataToJson(jsonData);
 }
 
 async function extractTextFromAllImages() {
   for (let i = 0; i < 2; i++) {
     updateJsonData(testText, i);
     //extractTextFromImage(filePath, i)
+    writeDataToJson();
   }
 }
 
@@ -47,14 +62,31 @@ function extractTextFromImage(filePath, id) {
 function updateJsonData(text, id) {
   if (isCorrectDocType(text)) {
     let newInvoiceData = getInvoiceData(text, id);
-    jsonData = { invoiceData: [...jsonData.invoiceData, newInvoiceData] };
+    jsonData.invoiceData.push(newInvoiceData);
   } else {
     console.log("not correct doc type");
   }
 }
 
-function writeDataToJson(jsonData) {
-  //TODO check if exits
+function writeDataToJson() {
+  if (fs.existsSync(pathToOutputJson)) {
+    const data = fs.readFileSync(pathToOutputJson);
+    const parsedData = JSON.parse(data);
+    // get numbers of pdf pages that have been already proceeded and saved to json
+    const pageNumbersProceeded = parsedData.invoiceData.map(
+      (invoice) => invoice.id
+    );
+    // If pdf page has been already proceeded don't add it again to json
+    const filteredDataWithoutRepetitions = jsonData.invoiceData.filter(
+      (invoice) => {
+        return !pageNumbersProceeded.includes(invoice.id);
+      }
+    );
+    jsonData.invoiceData = [
+      ...parsedData.invoiceData,
+      ...filteredDataWithoutRepetitions,
+    ];
+  }
   const json = JSON.stringify(jsonData);
   fs.writeFileSync(pathToOutputJson, json, "utf-8");
 }
