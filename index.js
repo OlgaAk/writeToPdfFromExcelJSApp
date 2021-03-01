@@ -1,3 +1,5 @@
+const convertPdfToImage = require("./convertPdfToImage");
+const orderPdfPages = require("./orderPdfPages");
 const writeExcelToPdf = require("./writeExcelToPdf");
 
 // input: pdf file and excel file
@@ -6,4 +8,9 @@ const writeExcelToPdf = require("./writeExcelToPdf");
 //using OCR by converting to JPG and compare data (date, price) to excel data)
 // step 2: write to pdf
 
-writeExcelToPdf().catch((err) => console.log(err));
+const excelPath = null; // todo get from user
+const pdfPath = null; // todo get from user
+
+writeExcelToPdf(excelPath, pdfPath).catch((err) => console.log(err));
+
+//convertPdfToImage();

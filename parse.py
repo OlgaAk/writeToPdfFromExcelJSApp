@@ -4,7 +4,6 @@ import os
 
 IMAGE_RESOLUTION = 500  # high resolution
 OUT_FOLDER_NAME = "out"
-OUT_IMAGE_NAME = "out"
 
 
 def main():
@@ -15,18 +14,14 @@ def main():
 
 def createJpgFromPdf(dpfPath):
     dir = os.path.abspath(os.getcwd())
-    # create folder for output files
-    if not os.path.exists(OUT_FOLDER_NAME):
-        os.makedirs(OUT_FOLDER_NAME)
+    prepareFolder(dir)
     try:
         pages = convert_from_path(dpfPath, IMAGE_RESOLUTION)
         for i, page in enumerate(pages):
-            if pageIsInvoice():  # skip horizintal pages because they are not invoices
-                # saves only to the current folder?
-                page.save(f"{OUT_IMAGE_NAME + str(i)}.jpg", "JPEG")
-                # move to the output folder
-                os.replace(dir + f"/{OUT_IMAGE_NAME + str(i)}.jpg", dir +
-                           f"/{OUT_FOLDER_NAME}/{OUT_IMAGE_NAME + str(i)}.jpg")
+            if pageIsInvoice(page):  # skip horizintal pages because they are not invoices
+                page.save(f"{str(i)}.jpg", "JPEG")
+                os.replace(dir + f"/{str(i)}.jpg", dir +
+                           f"/{OUT_FOLDER_NAME}/{str(i)}.jpg")  # move to the output folder
         print("success")
     except Exception as e:
         print(e)
@@ -34,6 +29,18 @@ def createJpgFromPdf(dpfPath):
 
 def pageIsInvoice(page):
     return page.height > page.width
+
+
+def cleanFolder(dir):
+    for file in os.listdir(dir):
+        os.remove(dir + f"/{file}")
+
+
+def prepareFolder(dir):
+    if not os.path.exists(OUT_FOLDER_NAME):
+        os.makedirs(OUT_FOLDER_NAME)
+    else:
+        cleanFolder(dir + f"/{OUT_FOLDER_NAME}")
 
 
 if __name__ == "__main__":

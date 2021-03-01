@@ -20,7 +20,8 @@ if (credicard) {
   SPACE_FROM_TOP = 65;
 }
 
-module.exports = async function writeExcelToPdf() {
+module.exports = async function writeExcelToPdf(excelPath, pdfPath) {
+  // excelPath, pdfPath use instead of constants
   readExcel()
     .then((data) => {
       if (data) {

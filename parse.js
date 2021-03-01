@@ -1,28 +1,12 @@
 const fs = require("fs");
 const tesseract = require("tesseract.js"); // OCR package
-const spawn = require("child_process").spawn; // run python script from node (pdf to image) for better quality
-
-convertPdfToImage();
-
-function convertPdfToImage() {
-  const pythonProcess = spawn("python3", ["parse.py", "report1.pdf"]); // takes pdf path as argument
-
-  pythonProcess.stdout.on("data", function (data) {
-    console.log(String.fromCharCode.apply(null, data));
-    if (data === "success") return true;
-  });
-  pythonProcess.stderr.on("data", (data) => {
-    console.log(String.fromCharCode.apply(null, data));
-  });
-}
 
 // stores parsed data before writing to json file
 let jsonData = {
   invoiceData: [],
 };
 
-const imageFilePath = "out.jpg"; // should be made dynamic
-const pathToOutputJson = "invoce_data.json";
+const PATH_TO_OUTPUT_JSON = "invoce_data.json";
 
 // Mock Data to substitute Tesseract job
 const testText =
@@ -69,8 +53,8 @@ function updateJsonData(text, id) {
 }
 
 function writeDataToJson() {
-  if (fs.existsSync(pathToOutputJson)) {
-    const data = fs.readFileSync(pathToOutputJson);
+  if (fs.existsSync(PATH_TO_OUTPUT_JSON)) {
+    const data = fs.readFileSync(PATH_TO_OUTPUT_JSON);
     const parsedData = JSON.parse(data);
     // get numbers of pdf pages that have been already proceeded and saved to json
     const pageNumbersProceeded = parsedData.invoiceData.map(
@@ -88,7 +72,7 @@ function writeDataToJson() {
     ];
   }
   const json = JSON.stringify(jsonData);
-  fs.writeFileSync(pathToOutputJson, json, "utf-8");
+  fs.writeFileSync(PATH_TO_OUTPUT_JSON, json, "utf-8");
 }
 
 // Gets needed substrings from text
