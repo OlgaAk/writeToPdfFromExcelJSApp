@@ -21,7 +21,7 @@ if (credicard) {
 }
 
 module.exports = async function writeExcelToPdf(excelPath, pdfPath) {
-  // excelPath, pdfPath use instead of constants
+  // excelPath, pdfPath to
   readExcel()
     .then((data) => {
       if (data) {

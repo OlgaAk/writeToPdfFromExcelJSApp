@@ -1,4 +1,6 @@
 const convertPdfToImage = require("./convertPdfToImage");
+const extractTextFromImages = require("./extractTextFromImages");
+const extractDataFromExcel2Json = require("./extractExcel2Json");
 const orderPdfPages = require("./orderPdfPages");
 const writeExcelToPdf = require("./writeExcelToPdf");
 
@@ -11,6 +13,8 @@ const writeExcelToPdf = require("./writeExcelToPdf");
 const excelPath = null; // todo get from user
 const pdfPath = null; // todo get from user
 
-writeExcelToPdf(excelPath, pdfPath).catch((err) => console.log(err));
+//writeExcelToPdf(excelPath, pdfPath).catch((err) => console.log(err));
 
-//convertPdfToImage();
+//convertPdfToImage("report12.pdf");
+
+extractTextFromImages();
