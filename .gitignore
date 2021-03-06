@@ -5,3 +5,5 @@ node_modules
 invoce_data.json
 *.jpg
 *.traineddata
+result_data.json
+excel_data.json

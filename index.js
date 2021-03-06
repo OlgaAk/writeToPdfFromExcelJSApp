@@ -1,8 +1,8 @@
 const convertPdfToImage = require("./convertPdfToImage");
 const extractTextFromImages = require("./extractTextFromImages");
-const extractDataFromExcel2Json = require("./extractExcel2Json");
-const orderPdfPages = require("./orderPdfPages");
-const writeExcelToPdf = require("./writeExcelToPdf");
+// const extractExcel2Json = require("./extractExcel2Json");
+const sortJsonData = require("./sortJsonData");
+// const writeExcelToPdf = require("./writeExcelToPdf");
 
 // input: pdf file and excel file
 // output: new pdf file with sorted pages with added text taken from excel file
@@ -17,4 +17,8 @@ const pdfPath = null; // todo get from user
 
 //convertPdfToImage("report12.pdf");
 
-extractTextFromImages();
+//extractTextFromImages();
+
+//extractExcel2Json();
+
+sortJsonData();

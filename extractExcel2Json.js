@@ -7,7 +7,7 @@ const COLUMN_NAME = "D"; // make user define
 const COLUMN_DATE = "A"; // make user define
 const COLUMN_SUM = "K";
 const COLUMN_SUM_INCOME = "F";
-const COLUMN_SUM_TOCARD = "G";
+const COLUMN_SUM_TOCARD = "J";
 let START_ROW = 10; //make user define
 
 let credicard = false;
@@ -17,8 +17,7 @@ if (credicard) {
 }
 
 writeExcelToJson();
-
-function writeExcelToJson() {
+module.exports = function writeExcelToJson() {
   // excelPath, pdfPath use instead of constants
   readExcel()
     .then((data) => {
@@ -29,7 +28,7 @@ function writeExcelToJson() {
       }
     })
     .catch((err) => console.log(err));
-}
+};
 
 function writeDataToJson(excelData) {
   const json = JSON.stringify(excelData);

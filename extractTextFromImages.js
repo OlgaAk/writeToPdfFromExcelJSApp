@@ -16,18 +16,19 @@ const testText2 =
 /// END Globals
 
 //run test
-testExctractWithoutTesseract();
+//testExctractWithoutTesseract();
 
 //extractTextFromImages();
 
-async function extractTextFromImages() {
+module.exports = async function extractTextFromImages() {
+  cleanOutputJson();
   if (fs.existsSync(PATH_TO_IMAGES_FOLDER)) {
     let files = fs.readdirSync(PATH_TO_IMAGES_FOLDER);
     for (const file of files) {
       await extractTextFromImage(file);
     }
   }
-}
+};
 
 async function extractTextFromImage(filePath) {
   await tesseract
@@ -46,15 +47,22 @@ async function extractTextFromImage(filePath) {
     });
 }
 
-function updateJsonData(text, id) {
-  //const id = Number(filePath.split(".")[0]); // number before .jpg extention
+function updateJsonData(text, filePath) {
+  const id = Number(filePath.split(".")[0]); // number before .jpg extention
 
   let newInvoiceData = getInvoiceData(text, id);
   writeDataToJson(newInvoiceData);
   //jsonData.invoiceData.push(newInvoiceData);
 }
 
+function cleanOutputJson() {
+  if (fs.existsSync(PATH_TO_OUTPUT_JSON)) {
+    fs.rmSync(PATH_TO_OUTPUT_JSON);
+  }
+}
+
 function writeDataToJson(newInvoiceData) {
+  let jsonData = {};
   if (fs.existsSync(PATH_TO_OUTPUT_JSON)) {
     const data = fs.readFileSync(PATH_TO_OUTPUT_JSON);
     const parsedData = JSON.parse(data);
@@ -63,12 +71,13 @@ function writeDataToJson(newInvoiceData) {
       (invoice) => invoice.id
     );
     if (pageNumbersProceeded.indexOf(newInvoiceData.id) == -1) {
-      let jsonData = { invoiceData: [] };
       jsonData.invoiceData = [...parsedData.invoiceData, newInvoiceData];
-      const json = JSON.stringify(jsonData);
-      fs.writeFileSync(PATH_TO_OUTPUT_JSON, json, "utf-8");
     }
+  } else {
+    jsonData.invoiceData = [newInvoiceData];
   }
+  const json = JSON.stringify(jsonData);
+  fs.writeFileSync(PATH_TO_OUTPUT_JSON, json, "utf-8");
 }
 
 // Gets needed substrings from text
