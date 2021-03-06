@@ -3,13 +3,16 @@ const PATH_TO_PDF_JSON = "invoce_data.json";
 const PATH_TO_EXCEL_JSON = "excel_data.json";
 const PATH_TO_RESULT_JSON = "result_data.json";
 
-module.exports = async function sortJsonData() {
+sortJsonData();
+
+async function sortJsonData() {
   const excelData = await getExcelDataFromJson();
   const pdfData = await gePdfDataFromJson();
   let sortedPdfData = [];
   for (let i = 0; i < excelData.length; i++) {
     for (let j = 0; j < pdfData.length; j++) {
-      if (isSameInvoice(excelData[i], pdfData[j])) {
+      let isSameInvoice = checkIfSameInvoice(excelData[i], pdfData[j]);
+      if (isSameInvoice) {
         let newPdfData = pdfData[j];
         newPdfData.excelId = excelData[i].id;
         newPdfData.excelName = excelData[i].cellName;
@@ -23,22 +26,23 @@ module.exports = async function sortJsonData() {
     return a.excelId - b.excelId;
   });
   write2Json(oderedPdfData);
-};
+}
 
-async function isSameInvoice(excelItem, pdfItem) {
+function checkIfSameInvoice(excelItem, pdfItem) {
   let dateExcel = excelItem.cellDate;
   let datePdf = pdfItem.invoiceDate;
   let sumExcel = getSum(excelItem);
   let sumPdf = pdfItem.invoiceSum;
-  if (await isSameDate(dateExcel, datePdf)) {
-    if (await isSameSum(sumExcel, sumPdf)) {
-      return true;
-    }
+  let isSameDate = checkIfSameDate(dateExcel, datePdf);
+  let isSameSum = checkIfSameSum(sumExcel, sumPdf);
+  if (isSameDate && isSameSum) {
+    return true;
+  } else {
+    return false;
   }
-  return false;
 }
 
-async function isSameDate(dateExcel, datePdf) {
+function checkIfSameDate(dateExcel, datePdf) {
   //Formats: ("29.01.2021") ("2021-01-29T00:00:00.000Z")
   const datePdfToArray = datePdf.split(".");
   const datePdfToDateFormat = `${datePdfToArray[2]}-${datePdfToArray[1]}-${datePdfToArray[0]}`; //"2021-01-29"
@@ -48,7 +52,7 @@ async function isSameDate(dateExcel, datePdf) {
   return date1.getTime() == date2.getTime();
 }
 
-async function isSameSum(sumExcel, sumPdf) {
+function checkIfSameSum(sumExcel, sumPdf) {
   //Formats: "30-00" -30  -840.52
   console.log(sumExcel, sumPdf);
   const sumPdfInt = sumPdf.split("-").join("."); //"30-00" -> "30.00"
@@ -82,3 +86,5 @@ function write2Json(data) {
   const json = JSON.stringify(data);
   fs.writeFileSync(PATH_TO_RESULT_JSON, json, "utf-8");
 }
+
+module.exports = sortJsonData;
