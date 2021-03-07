@@ -1,13 +1,19 @@
-const spawn = require("child_process").spawn; // run python script from node (pdf to image) for better quality
+const spawn = require("child_process").execSync; // run python script from node (pdf to image) for better quality
 
-module.exports = function convertPdfToImage(pathToPdf) {
-  const pythonProcess = spawn("python3", ["parse.py", pathToPdf]); // takes pdf path as argument
+module.exports = async function convertPdfToImage(pathToPdf) {
+  //   const pythonProcess = spawn("python3", ["parse.py", pathToPdf]); // takes pdf path as argument
 
-  pythonProcess.stdout.on("data", function (data) {
-    console.log(String.fromCharCode.apply(null, data));
-    if (data === "success") return true;
-  });
-  pythonProcess.stderr.on("data", (data) => {
-    console.log(String.fromCharCode.apply(null, data));
-  });
+  var result = spawn("python3 parse.py " + pathToPdf);
+
+  //   pythonProcess.stdout.on("data", async function (data) {
+  //     console.log(String.fromCharCode.apply(null, data));
+  //     if (data === "success") return true;
+  //     pythonProcess.kill();
+  //   });
+  //   pythonProcess.stderr.on("data", async (data) => {
+  //     console.log(String.fromCharCode.apply(null, data));
+  //     result = false;
+  //   });
+
+  return String.fromCharCode.apply(null, result);
 };

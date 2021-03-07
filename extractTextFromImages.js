@@ -28,6 +28,7 @@ module.exports = async function extractTextFromImages() {
       await extractTextFromImage(file);
     }
   }
+  return true; //tofix
 };
 
 async function extractTextFromImage(filePath) {

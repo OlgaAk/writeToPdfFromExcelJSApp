@@ -16,18 +16,17 @@ if (credicard) {
   START_ROW = 7;
 }
 
-writeExcelToJson();
-module.exports = function writeExcelToJson() {
+//writeExcelToJson();
+module.exports = async function writeExcelToJson() {
   // excelPath, pdfPath use instead of constants
-  readExcel()
-    .then((data) => {
-      if (data) {
-        writeDataToJson(data);
-      } else {
-        console.log("no data from excel");
-      }
-    })
-    .catch((err) => console.log(err));
+  const data = await readExcel();
+  if (data) {
+    writeDataToJson(data);
+    return true; //tofix
+  } else {
+    console.log("no data from excel");
+    return false;
+  }
 };
 
 function writeDataToJson(excelData) {

@@ -3,7 +3,7 @@ const PATH_TO_PDF_JSON = "invoce_data.json";
 const PATH_TO_EXCEL_JSON = "excel_data.json";
 const PATH_TO_RESULT_JSON = "result_data.json";
 
-sortJsonData();
+//sortJsonData();
 
 async function sortJsonData() {
   const excelData = await getExcelDataFromJson();
@@ -26,6 +26,7 @@ async function sortJsonData() {
     return a.excelId - b.excelId;
   });
   write2Json(oderedPdfData);
+  return true;
 }
 
 function checkIfSameInvoice(excelItem, pdfItem) {

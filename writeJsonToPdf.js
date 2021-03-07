@@ -8,18 +8,17 @@ const TEXT_COLOR = rgb(0.41, 0.48, 0.74); //make user define
 const TEXT_SIZE = 15; //make user define
 let SPACE_FROM_TOP = 25;
 
-writeJsonToPdf();
+//writeJsonToPdf();
 
-function writeJsonToPdf(excelPath, jsonPath) {
-  readJson()
-    .then((data) => {
-      if (data) {
-        writeToPdf(data);
-      } else {
-        console.log("no data from excel");
-      }
-    })
-    .catch((err) => console.log(err));
+async function writeJsonToPdf(excelPath, jsonPath) {
+  const data = await readJson();
+  if (data) {
+    writeToPdf(data);
+    return true; //tofix
+  } else {
+    console.log("no data from excel");
+    return false;
+  }
 }
 
 async function writeToPdf(jsonData) {
@@ -81,3 +80,5 @@ async function setUpPDF(jsonData) {
 
   return [newPdfDoc, font, pages]; //if pages has 1 item it is not array and not itirable tofix
 }
+
+module.exports = writeJsonToPdf;
