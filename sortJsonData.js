@@ -45,6 +45,7 @@ function checkIfSameInvoice(excelItem, pdfItem) {
 
 function checkIfSameDate(dateExcel, datePdf) {
   //Formats: ("29.01.2021") ("2021-01-29T00:00:00.000Z")
+  console.log(dateExcel, datePdf);
   const datePdfToArray = datePdf.split(".");
   const datePdfToDateFormat = `${datePdfToArray[2]}-${datePdfToArray[1]}-${datePdfToArray[0]}`; //"2021-01-29"
   const date1 = new Date(datePdfToDateFormat);

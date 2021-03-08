@@ -1,8 +1,8 @@
 const { PDFDocument, StandardFonts, rgb } = require("pdf-lib");
 const fs = require("fs");
 
-let SOURCE_PDF_PATH = "./report12.pdf"; //get path from user
-let OUTPUT_PDF_PATH = "./Belege_Januar_2021_2.pdf"; //get path from user
+//let SOURCE_PDF_PATH = "./report.pdf"; //get path from user
+let OUTPUT_PDF_PATH = "./Belege.pdf"; //get path from user
 let SOURCE_JSON_PATH = "result_data.json"; //get path from user
 const TEXT_COLOR = rgb(0.41, 0.48, 0.74); //make user define
 const TEXT_SIZE = 15; //make user define
@@ -10,10 +10,10 @@ let SPACE_FROM_TOP = 25;
 
 //writeJsonToPdf();
 
-async function writeJsonToPdf(excelPath, jsonPath) {
+async function writeJsonToPdf(sourcePdfPath) {
   const data = await readJson();
   if (data) {
-    writeToPdf(data);
+    writeToPdf(data, sourcePdfPath);
     return true; //tofix
   } else {
     console.log("no data from excel");
@@ -21,9 +21,9 @@ async function writeJsonToPdf(excelPath, jsonPath) {
   }
 }
 
-async function writeToPdf(jsonData) {
+async function writeToPdf(jsonData, sourcePdfPath) {
   try {
-    const [doc, font, pages] = await setUpPDF(jsonData);
+    const [doc, font, pages] = await setUpPDF(jsonData, sourcePdfPath);
     await writeTextToPDFPages(pages, font, jsonData);
 
     fs.writeFileSync(OUTPUT_PDF_PATH, await doc.save());
@@ -65,8 +65,8 @@ async function drawTextOnPdf(page, jsonItem, font, size, color) {
   });
 }
 
-async function setUpPDF(jsonData) {
-  const doc = await PDFDocument.load(fs.readFileSync(SOURCE_PDF_PATH));
+async function setUpPDF(jsonData, sourcePdfPath) {
+  const doc = await PDFDocument.load(fs.readFileSync(sourcePdfPath));
 
   let pdfPageNumbers = jsonData.map((item) => {
     return item.id;

@@ -2,7 +2,7 @@ const fs = require("fs");
 const ExcelJS = require("exceljs");
 const PATH_TO_OUTPUT_JSON = "excel_data.json";
 
-let SOURCE_EXCEL_PATH = "00.xlsx"; //get path from user
+//let SOURCE_EXCEL_PATH = "00.xlsx"; //get path from user
 const COLUMN_NAME = "D"; // make user define
 const COLUMN_DATE = "A"; // make user define
 const COLUMN_SUM = "K";
@@ -17,9 +17,9 @@ if (credicard) {
 }
 
 //writeExcelToJson();
-module.exports = async function writeExcelToJson() {
+module.exports = async function writeExcelToJson(excelPath) {
   // excelPath, pdfPath use instead of constants
-  const data = await readExcel();
+  const data = await readExcel(excelPath);
   if (data) {
     writeDataToJson(data);
     return true; //tofix
@@ -34,8 +34,8 @@ function writeDataToJson(excelData) {
   fs.writeFileSync(PATH_TO_OUTPUT_JSON, json, "utf-8");
 }
 
-async function readExcel() {
-  const sheet = await loadExcelSheet();
+async function readExcel(excelPath) {
+  const sheet = await loadExcelSheet(excelPath);
   try {
     const cellValues = getCellValues(
       sheet,
@@ -50,10 +50,10 @@ async function readExcel() {
   } catch (err) {}
 }
 
-async function loadExcelSheet() {
+async function loadExcelSheet(excelPath) {
   const workbook = new ExcelJS.Workbook();
   try {
-    await workbook.xlsx.readFile(SOURCE_EXCEL_PATH);
+    await workbook.xlsx.readFile(excelPath);
     return (sheet = workbook.worksheets[0]); // make user define
   } catch (err) {
     if (err.message.includes("File not found")) {
